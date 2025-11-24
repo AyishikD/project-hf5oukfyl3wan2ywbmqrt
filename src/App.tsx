@@ -19,9 +19,18 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Don't retry on authentication errors
+        if (error instanceof Error && error.message.includes("Failed to fetch")) {
+          return false;
+        }
+        return failureCount < 1;
+      },
       refetchOnWindowFocus: false,
       staleTime: 30000,
+    },
+    mutations: {
+      retry: false,
     },
   },
 });
