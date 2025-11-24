@@ -22,14 +22,11 @@ export const Header = () => {
       try {
         return await UserEntity.me();
       } catch (error) {
-        // Don't log expected authentication errors
-        if (error instanceof Error && error.message !== "Failed to fetch") {
-          console.error("Unexpected error fetching user:", error);
-        }
+        console.error("Error fetching user:", error);
         throw error;
       }
     },
-    retry: false,
+    retry: 1,
     staleTime: 60000,
   });
 
@@ -40,21 +37,40 @@ export const Header = () => {
         const notifications = await Notification.filter({ read: false }, "-created_at", 100);
         return notifications.length;
       } catch (error) {
+        console.error("Error fetching notifications:", error);
         return 0;
       }
     },
     enabled: !!user,
-    retry: false,
+    retry: 1,
   });
 
   useEffect(() => {
     if (userError) {
-      // Redirect to login for any authentication error
+      console.log("User authentication error, redirecting to login...");
       UserEntity.login();
     }
   }, [userError]);
 
-  if (isLoading || !user) {
+  if (isLoading) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-16 items-center justify-between px-6">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <span className="text-white font-bold text-sm">DC</span>
+            </div>
+            <span className="font-semibold text-lg">DocuCompliance</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  if (!user) {
     return null;
   }
 
