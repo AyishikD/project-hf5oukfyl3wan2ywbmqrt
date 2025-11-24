@@ -27,6 +27,7 @@ export const Header = () => {
       }
     },
     retry: false,
+    staleTime: 60000,
   });
 
   const { data: unreadCount = 0 } = useQuery({
@@ -41,25 +42,27 @@ export const Header = () => {
       }
     },
     enabled: !!user,
+    retry: false,
   });
 
   useEffect(() => {
-    if (userError) {
+    if (userError && userError.message !== "Failed to fetch") {
       UserEntity.login();
     }
   }, [userError]);
+
+  if (!user) {
+    return null;
+  }
 
   const handleLogout = async () => {
     try {
       await UserEntity.logout();
     } catch (error) {
       console.error("Error logging out:", error);
+      window.location.href = "/";
     }
   };
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
