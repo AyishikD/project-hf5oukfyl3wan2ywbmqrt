@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DocumentCard } from "@/components/documents/DocumentCard";
-import { Document } from "@/entities";
+import { Document, User } from "@/entities";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,25 @@ export const Documents = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  const { data: user, error: userError, isLoading: userLoading } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      try {
+        return await User.me();
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        throw error;
+      }
+    },
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (userError) {
+      User.login();
+    }
+  }, [userError]);
+
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["allDocuments"],
     queryFn: async () => {
@@ -30,6 +49,7 @@ export const Documents = () => {
         return [];
       }
     },
+    enabled: !!user,
   });
 
   const filteredDocuments = documents.filter((doc: any) => {
@@ -53,6 +73,21 @@ export const Documents = () => {
     "Compliance Notices",
     "Agreements",
   ];
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

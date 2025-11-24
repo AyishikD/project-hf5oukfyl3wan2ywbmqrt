@@ -11,20 +11,22 @@ import { useNavigate } from "react-router-dom";
 import { User as UserEntity } from "@/entities";
 import { useQuery } from "@tanstack/react-query";
 import { Notification } from "@/entities";
+import { useEffect } from "react";
 
 export const Header = () => {
   const navigate = useNavigate();
   
-  const { data: user } = useQuery({
+  const { data: user, error: userError } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       try {
         return await UserEntity.me();
       } catch (error) {
         console.error("Error fetching user:", error);
-        return null;
+        throw error;
       }
     },
+    retry: false,
   });
 
   const { data: unreadCount = 0 } = useQuery({
@@ -38,7 +40,14 @@ export const Header = () => {
         return 0;
       }
     },
+    enabled: !!user,
   });
+
+  useEffect(() => {
+    if (userError) {
+      UserEntity.login();
+    }
+  }, [userError]);
 
   const handleLogout = async () => {
     try {
@@ -47,6 +56,10 @@ export const Header = () => {
       console.error("Error logging out:", error);
     }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

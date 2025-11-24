@@ -8,23 +8,31 @@ import { SuggestionCard } from "@/components/dashboard/SuggestionCard";
 import { User, Deadline, Document, AISuggestion } from "@/entities";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({
+  const { data: user, error: userError, isLoading: userLoading } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       try {
         return await User.me();
       } catch (error) {
         console.error("Error fetching user:", error);
-        return null;
+        throw error;
       }
     },
+    retry: false,
   });
+
+  useEffect(() => {
+    if (userError) {
+      User.login();
+    }
+  }, [userError]);
 
   const { data: deadlines = [] } = useQuery({
     queryKey: ["upcomingDeadlines"],
@@ -40,6 +48,7 @@ export const Dashboard = () => {
         return [];
       }
     },
+    enabled: !!user,
   });
 
   const { data: recentDocs = [] } = useQuery({
@@ -52,6 +61,7 @@ export const Dashboard = () => {
         return [];
       }
     },
+    enabled: !!user,
   });
 
   const { data: suggestions = [] } = useQuery({
@@ -68,6 +78,7 @@ export const Dashboard = () => {
         return [];
       }
     },
+    enabled: !!user,
   });
 
   const dismissSuggestion = useMutation({
@@ -106,6 +117,21 @@ export const Dashboard = () => {
     );
     return daysUntil <= 7;
   }).length;
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
