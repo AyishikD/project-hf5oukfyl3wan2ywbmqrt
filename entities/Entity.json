@@ -1,0 +1,54 @@
+{
+  "name": "Entity",
+  "description": "People and business entities",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Entity name"
+    },
+    "type": {
+      "type": "string",
+      "description": "Type (Person, Business)"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "pan": {
+      "type": "string",
+      "description": "PAN number"
+    },
+    "aadhaar": {
+      "type": "string",
+      "description": "Aadhaar number (for persons)"
+    },
+    "gstin": {
+      "type": "string",
+      "description": "GST number (for businesses)"
+    },
+    "business_type": {
+      "type": "string",
+      "description": "Business type (Private Limited, LLP, Partnership, Sole Proprietor)"
+    },
+    "incorporation_date": {
+      "type": "string",
+      "description": "Business incorporation date"
+    },
+    "directors": {
+      "type": "string",
+      "description": "JSON array of director names"
+    },
+    "compliance_status": {
+      "type": "string",
+      "description": "Overall compliance status (Compliant, At Risk, Non-Compliant)"
+    },
+    "risk_level": {
+      "type": "string",
+      "description": "Risk level (Low, Medium, High)"
+    }
+  }
+}

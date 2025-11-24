@@ -1,0 +1,42 @@
+{
+  "name": "Deadline",
+  "description": "Compliance deadlines and reminders",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Deadline title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description"
+    },
+    "due_date": {
+      "type": "string",
+      "description": "Due date"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category (Tax, Legal, Compliance, Renewal, Filing)"
+    },
+    "priority": {
+      "type": "string",
+      "description": "Priority level (High, Medium, Low)"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status (Pending, In Progress, Completed, Overdue)"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "Associated entity ID"
+    },
+    "document_id": {
+      "type": "string",
+      "description": "Related document ID"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "description": "Whether reminder notification was sent"
+    }
+  }
+}

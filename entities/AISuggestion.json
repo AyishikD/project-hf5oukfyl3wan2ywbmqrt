@@ -1,0 +1,38 @@
+{
+  "name": "AISuggestion",
+  "description": "AI-generated suggestions and actions",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Suggestion title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Detailed suggestion message"
+    },
+    "type": {
+      "type": "string",
+      "description": "Type (Document Action, Compliance Fix, Data Mismatch, Categorization, Reminder)"
+    },
+    "priority": {
+      "type": "string",
+      "description": "Priority (High, Medium, Low)"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status (New, Dismissed, Actioned)"
+    },
+    "document_id": {
+      "type": "string",
+      "description": "Related document ID"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "Related entity ID"
+    },
+    "action_taken": {
+      "type": "boolean",
+      "description": "Whether user has acted on this suggestion"
+    }
+  }
+}

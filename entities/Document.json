@@ -1,0 +1,46 @@
+{
+  "name": "Document",
+  "description": "Uploaded documents with AI-extracted data",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Document name"
+    },
+    "type": {
+      "type": "string",
+      "description": "Document type (GST Certificate, PAN Card, Aadhaar, Bank Statement, etc.)"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category (Personal IDs, Business Registrations, Tax, Legal, HR, Banking, Insurance, Compliance Notices, Agreements)"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of the uploaded document"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID of the associated entity (person/business)"
+    },
+    "extracted_fields": {
+      "type": "string",
+      "description": "JSON string of extracted fields from OCR/AI"
+    },
+    "compliance_status": {
+      "type": "string",
+      "description": "Compliance status (Valid, Expiring Soon, Expired, Action Required)"
+    },
+    "expiry_date": {
+      "type": "string",
+      "description": "Document expiry date if applicable"
+    },
+    "ai_notes": {
+      "type": "string",
+      "description": "AI-generated notes and insights"
+    },
+    "status": {
+      "type": "string",
+      "description": "Document status (Processing, Ready, Needs Review)"
+    }
+  }
+}
