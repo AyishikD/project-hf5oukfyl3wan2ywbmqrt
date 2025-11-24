@@ -26,15 +26,17 @@ export const Dashboard = () => {
         throw error;
       }
     },
-    retry: 1,
-    retryDelay: 1000,
+    retry: false,
+    staleTime: 0,
   });
 
   useEffect(() => {
     if (userError) {
-      navigate("/");
+      console.log("User authentication error, redirecting to login...");
+      // Trigger login flow
+      User.login().catch(console.error);
     }
-  }, [userError, navigate]);
+  }, [userError]);
 
   const { data: deadlines = [] } = useQuery({
     queryKey: ["upcomingDeadlines"],
@@ -136,10 +138,10 @@ export const Dashboard = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-lg text-muted-foreground">
-            Unable to load dashboard
+            Please log in to access your dashboard
           </p>
-          <Button onClick={() => navigate("/")}>
-            Return to Home
+          <Button onClick={() => User.login()}>
+            Log In
           </Button>
         </div>
       </div>
