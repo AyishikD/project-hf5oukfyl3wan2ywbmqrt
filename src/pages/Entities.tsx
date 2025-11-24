@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { EntityCard } from "@/components/entities/EntityCard";
-import { Entity } from "@/entities";
+import { Entity, User } from "@/entities";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +21,18 @@ export const Entities = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
 
+  const { data: user } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      try {
+        return await User.me();
+      } catch (error) {
+        throw error;
+      }
+    },
+    retry: false,
+  });
+
   const { data: entities = [], isLoading } = useQuery({
     queryKey: ["allEntities"],
     queryFn: async () => {
@@ -31,7 +43,18 @@ export const Entities = () => {
         return [];
       }
     },
+    enabled: !!user,
   });
+
+  useEffect(() => {
+    if (!user) {
+      User.login();
+    }
+  }, [user]);
+
+  if (!user) {
+    return null;
+  }
 
   const filteredEntities = entities.filter((entity: any) => {
     const matchesSearch =

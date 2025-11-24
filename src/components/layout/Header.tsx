@@ -16,13 +16,16 @@ import { useEffect } from "react";
 export const Header = () => {
   const navigate = useNavigate();
   
-  const { data: user, error: userError } = useQuery({
+  const { data: user, error: userError, isLoading } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       try {
         return await UserEntity.me();
       } catch (error) {
-        console.error("Error fetching user:", error);
+        // Don't log expected authentication errors
+        if (error instanceof Error && error.message !== "Failed to fetch") {
+          console.error("Unexpected error fetching user:", error);
+        }
         throw error;
       }
     },
@@ -37,7 +40,6 @@ export const Header = () => {
         const notifications = await Notification.filter({ read: false }, "-created_at", 100);
         return notifications.length;
       } catch (error) {
-        console.error("Error fetching notifications:", error);
         return 0;
       }
     },
@@ -46,12 +48,13 @@ export const Header = () => {
   });
 
   useEffect(() => {
-    if (userError && userError.message !== "Failed to fetch") {
+    if (userError) {
+      // Redirect to login for any authentication error
       UserEntity.login();
     }
   }, [userError]);
 
-  if (!user) {
+  if (isLoading || !user) {
     return null;
   }
 
