@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { DocumentCard } from "@/components/documents/DocumentCard";
+import { NetworkError } from "@/components/NetworkError";
 import { Document, User } from "@/entities";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,12 +16,18 @@ import {
 } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
 
+const isNetworkError = (error: any) => {
+  return error?.message === "Failed to fetch" || 
+         error?.name === "TypeError" ||
+         !navigator.onLine;
+};
+
 export const Documents = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { data: user, error: userError, isLoading: userLoading } = useQuery({
+  const { data: user, error: userError, isLoading: userLoading, refetch: refetchUser } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       try {
@@ -30,11 +37,12 @@ export const Documents = () => {
         throw error;
       }
     },
-    retry: false,
+    retry: 1,
+    retryDelay: 1000,
   });
 
   useEffect(() => {
-    if (userError) {
+    if (userError && !isNetworkError(userError)) {
       User.login();
     }
   }, [userError]);
@@ -73,6 +81,10 @@ export const Documents = () => {
     "Compliance Notices",
     "Agreements",
   ];
+
+  if (userError && isNetworkError(userError)) {
+    return <NetworkError onRetry={() => refetchUser()} />;
+  }
 
   if (userLoading) {
     return (

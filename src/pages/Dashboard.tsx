@@ -5,17 +5,24 @@ import { AIBanner } from "@/components/dashboard/AIBanner";
 import { DeadlineCard } from "@/components/dashboard/DeadlineCard";
 import { RecentDocuments } from "@/components/dashboard/RecentDocuments";
 import { SuggestionCard } from "@/components/dashboard/SuggestionCard";
+import { NetworkError } from "@/components/NetworkError";
 import { User, Deadline, Document, AISuggestion } from "@/entities";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+
+const isNetworkError = (error: any) => {
+  return error?.message === "Failed to fetch" || 
+         error?.name === "TypeError" ||
+         !navigator.onLine;
+};
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: user, error: userError, isLoading: userLoading } = useQuery({
+  const { data: user, error: userError, isLoading: userLoading, refetch: refetchUser } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       try {
@@ -25,11 +32,12 @@ export const Dashboard = () => {
         throw error;
       }
     },
-    retry: false,
+    retry: 1,
+    retryDelay: 1000,
   });
 
   useEffect(() => {
-    if (userError) {
+    if (userError && !isNetworkError(userError)) {
       User.login();
     }
   }, [userError]);
@@ -118,12 +126,16 @@ export const Dashboard = () => {
     return daysUntil <= 7;
   }).length;
 
+  if (userError && isNetworkError(userError)) {
+    return <NetworkError onRetry={() => refetchUser()} />;
+  }
+
   if (userLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -164,6 +176,11 @@ export const Dashboard = () => {
                       onClick={() => navigate(`/deadline/${deadline.id}`)}
                     />
                   ))}
+                  {deadlines.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No upcoming deadlines.</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
